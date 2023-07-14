@@ -3,7 +3,7 @@ import threading
 
 import pytest
 
-from src.exporter import Exporter
+from celery_exporter.exporter import Exporter
 
 
 def pytest_addoption(parser):

@@ -1,4 +1,4 @@
-from .exporter import transform_option_value
+from celery_exporter.exporter import transform_option_value
 
 
 def test_transform_option_value():

@@ -184,7 +184,7 @@ def test_worker_generic_task_sent_hostname(threaded_exporter, celery_app):
                 "celery_task_sent_total",
                 labels={
                     "hostname": "generic",
-                    "name": "src.test_metrics.succeed",
+                    "name": "test_metrics.succeed",
                     "queue_name": "celery",
                 },
             )

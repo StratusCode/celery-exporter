@@ -4,6 +4,7 @@ import click
 import pretty_errors  # type: ignore
 from prometheus_client import Histogram
 
+from . import config
 from .exporter import Exporter
 from .help import cmd_help
 
@@ -115,3 +116,16 @@ def cli(  # pylint: disable=too-many-arguments
         purge_offline_worker_metrics,
         generic_hostname_task_sent_metric,
     ).run(ctx.params)
+
+
+def via_config_file():
+    cfg = config.load()
+
+    click_params = cfg.to_click_params()
+
+    Exporter().run(click_params)
+
+
+if __name__ == "__main__":
+    # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
+    cli(auto_envvar_prefix="CE")
