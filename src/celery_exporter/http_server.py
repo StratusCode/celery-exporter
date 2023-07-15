@@ -41,7 +41,7 @@ def health():
     uri = conn.as_uri()
 
     try:
-        conn.ensure_connection(max_retries=3)
+        conn.ensure_connection(timeout=2.0)
     except kombu.exceptions.OperationalError:
         logger.error("Failed to connect to broker='{}'", uri)
         return (f"Failed to connect to broker: '{uri}'", 500)

@@ -1,5 +1,7 @@
 import click
 
+import sys
+
 # pylint: disable=unused-import
 import pretty_errors  # type: ignore
 from prometheus_client import Histogram
@@ -71,7 +73,7 @@ default_buckets_str = ",".join(map(str, Histogram.DEFAULT_BUCKETS))
     "--worker-timeout",
     default=5 * 60,
     show_default=True,
-    help="If no heartbeat has been recieved from a worker in this many seconds, "
+    help="If no heartbeat has been received from a worker in this many seconds, "
     "that a worker will be considered dead. If set to 0, workers will never be "
     "timed out",
 )
@@ -79,7 +81,7 @@ default_buckets_str = ",".join(map(str, Histogram.DEFAULT_BUCKETS))
     "--purge-offline-worker-metrics",
     default=10 * 60,
     show_default=True,
-    help="If no heartbeat has been recieved from a worker in this many seconds, "
+    help="If no heartbeat has been received from a worker in this many seconds, "
     "that a worker will be considered dead. Metrics will be purged for this worker "
     "after this many seconds. If set to 0, metrics will never be purged. Helps "
     "with keeping the cardinality of the metrics low.",
@@ -123,7 +125,10 @@ def via_config_file():
 
     click_params = cfg.to_click_params()
 
-    Exporter().run(click_params)
+    try:
+        Exporter().run(click_params)
+    except (KeyboardInterrupt, SystemExit):
+        sys.exit(0)
 
 
 if __name__ == "__main__":
