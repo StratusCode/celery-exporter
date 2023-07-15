@@ -1,3 +1,54 @@
+[project]
+authors = [
+    {name = "Dani Hodovic", email = "dani.hodovic@gmail.com"},
+]
+maintainers = [
+    {name = "Nick Joyce", email = "nick@stratuscode.com"},
+]
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "celery<6.0,>=5.3",
+    "click<9.0,>=8.1",
+    "configur8<3.0,>=2.0",
+    "Flask<3.0,>=2.3",
+    "loguru<1.0,>=0.7",
+    "pretty-errors<2.0,>=1.2",
+    "prometheus-client<1.0,>=0.17",
+    "pyyaml<7.0,>=6.0",
+    "redis<5.0,>=4.6",
+    "waitress<3.0,>=2.1",
+]
+name = "celery-exporter"
+version = "0.9.1"
+description = ""
+
+[project.scripts]
+celery-exporter = "celery_exporter.cli:via_config_file"
+
+[tool.pdm.dev-dependencies]
+dev = [
+  "black",
+  "celery-types",
+  "isort",
+  "jedi",
+  "mypy",
+  "pre-commit",
+  "ptpython",
+  "pudb",
+  "pylint",
+  "pytest",
+  "pytest-celery",
+  "pytest-cov",
+  "pytest-mock",
+  "requests",
+  "types-requests",
+  "types-waitress",
+]
+
+[build-system]
+requires = ["pdm-backend", "pybind11"]
+build-backend = "pdm.backend"
+
 [tool.black]
 skip_numeric_underscore_normalization = true
 exclude = ".*(venv|virtualenv|.poetry|migrations|node_modules)"
@@ -7,48 +58,3 @@ profile = "black"
 multi_line_output = 3
 skip = '.virtualenv,.venv,.poetry,.poetry-cache'
 
-[tool.poetry]
-name = "celery-exporter"
-version = "0.9.1"
-description = ""
-authors = ["Dani Hodovic <dani.hodovic@gmail.com>"]
-maintainers = ["Nick Joyce <nick@stratuscode.com>"]
-
-[tool.poetry.dependencies]
-python = ">=3.8,<3.12"
-configur8 = "^2.0"
-celery = "^5.0"
-prometheus-client = "^0.13.1"
-click = "^8.0.4"
-pretty-errors = "^1.2.19"
-loguru = "^0.6.0"
-redis = "^4.2.2"
-Flask = "^2.0.3"
-waitress = "^2.0.0"
-pylint = "^2.7.1"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.1"
-black = "^22.1.0"
-isort = "^5.10.1"
-jedi = "^0.18.0"
-pudb = "^2020.1"
-requests = "^2.25.1"
-pylint = "^2.7.1"
-pytest-cov = "^3.0.0"
-ptpython = "^3.0.13"
-pytest-mock = "^3.5.1"
-pyinstaller = "^5"
-mypy = "^0.931"
-types-requests = "^2.27.11"
-types-waitress = "^2.0.6"
-celery-types = "^0.11.0"
-pre-commit = "^2.19.0"
-pytest-celery = "^0.0.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-celery-exporter = "celery_exporter.cli:via_config_file"

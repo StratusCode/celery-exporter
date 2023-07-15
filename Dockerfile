@@ -1,22 +1,35 @@
-FROM python:3.10-slim-bullseye
+ARG PYTHON_VERSION=3.11
+ARG DEBIAN_VERSION=bullseye
+ARG DATE=20230715
+ARG REPO_URL=us.gcr.io/stunning-base-208718/base-images
+
+# this multi-stage build compiles the python dependencies
+FROM ${REPO_URL}/python-dev:${PYTHON_VERSION}-${DEBIAN_VERSION}-${DATE} as builder
+
+COPY pyproject.toml pdm.lock /app/
+
+RUN mkdir __pypackages__
+RUN --mount=type=ssh pdm sync --prod --no-editable --clean -vv --no-isolation
+
+RUN python -m compileall /app/__pypackages__/
+
+COPY . /app
+RUN --mount=type=ssh pdm sync --prod --clean -vv --no-isolation
+
+RUN python -m compileall /app/__pypackages__/
+
+FROM ${REPO_URL}/python:${PYTHON_VERSION}-${DEBIAN_VERSION}-${DATE}
+
+ARG PYTHON_VERSION
+
+# install all the python dependencies from the builder container
+COPY --from=builder --chown=1000 /app /app
+
+# set up the python path so that the app can be imported
+RUN echo "/app/__pypackages__/${PYTHON_VERSION}/lib\n/app/src" > /usr/local/lib/python${PYTHON_VERSION}/site-packages/app.pth
+ENV PATH=/app/__pypackages__/${PYTHON_VERSION}/bin:$PATH
+
 
 EXPOSE 9808
-ENV PYTHONUNBUFFERED 1
 
-WORKDIR /app/
-COPY pyproject.toml poetry.lock /app/
-RUN apt-get update && \
-    apt-get -y dist-upgrade && \
-    apt install -y locales libcurl4-openssl-dev libssl-dev build-essential\
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/* \
-    && pip install -U pip poetry \
-    && rm -rf /root/.cache \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-interaction \
-    && rm -rf /root/.cache \
-    && apt remove -y build-essential
-
-COPY . /app/
-
-ENTRYPOINT ["python", "/app/cli.py"]
+ENTRYPOINT [ "celery-exporter" ]
