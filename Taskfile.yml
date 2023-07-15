@@ -62,7 +62,6 @@ tasks:
     run: once
     cmds:
       - task: docker:build
-        vars:
   publish:
     desc: Publish the image to the Docker registry.
     run: once
