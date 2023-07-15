@@ -2,6 +2,22 @@
 # yamllint disable rule:line-length
 version: '3'
 
+vars:
+  PYTHON_VERSION: '3.11'
+  GOOGLE_PROJECT_ID: "stunning-base-208718"
+
+includes:
+  git:
+    taskfile: .taskfiles/git.yml
+  docker:
+    taskfile: .taskfiles/docker.yml
+    vars:
+      DOCKER_IMAGE_PREFIX: '{{.GOOGLE_PROJECT_ID}}/'
+      DOCKER_IMAGE_NAME: celery-exporter
+      DOCKER_BUILD_ARGS: >-
+        {{.DOCKER_BUILD_ARGS}}
+        PYTHON_VERSION="{{.PYTHON_VERSION}}"
+
 tasks:
   build-image:
     desc: Builds a docker image
@@ -41,3 +57,19 @@ tasks:
         --tag latest
         --name celery-exporter
         --file ./celery-exporter
+  package:
+    desc: Build and package the Docker image.
+    run: once
+    cmds:
+      - task: docker:build
+        vars:
+  publish:
+    desc: Publish the image to the Docker registry.
+    run: once
+    deps:
+      - task: package
+    preconditions:
+      - sh: '[ "{{.GIT_TREE_STATE}}" = "clean" ]'
+        msg: "git working directory is not clean"
+    cmds:
+      - task: docker:push

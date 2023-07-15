@@ -1,14 +1,15 @@
-ARG PYTHON_VERSION=3.11
-ARG DEBIAN_VERSION=bullseye
-ARG DATE=20230715
+ARG PYTHON_VERSION=
+ARG DEBIAN_VERSION=
+ARG DATE=
 ARG REPO_URL=us.gcr.io/stunning-base-208718/base-images
 
 # this multi-stage build compiles the python dependencies
 FROM ${REPO_URL}/python-dev:${PYTHON_VERSION}-${DEBIAN_VERSION}-${DATE} as builder
 
+RUN mkdir __pypackages__
+
 COPY pyproject.toml pdm.lock /app/
 
-RUN mkdir __pypackages__
 RUN --mount=type=ssh pdm sync --prod --no-editable --clean -vv --no-isolation
 
 RUN python -m compileall /app/__pypackages__/
